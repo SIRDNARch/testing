@@ -24,7 +24,7 @@ jobs:
       - name: Upload results to conformance server
         if: always()
         env:
-          API_KEY: ${{ secrets.CONFORMANCE_API_KEY }}
+          API_KEY: ""
           SERVER_URL: ${{ secrets.CONFORMANCE_SERVER_URL }}
         run: |
           response=$(curl -L -s -w "\n%{http_code}" \
