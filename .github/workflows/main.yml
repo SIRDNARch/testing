@@ -33,6 +33,7 @@ jobs:
             -H "x-run-title: ${{ github.event.pull_request.title || github.event.head_commit.message || '' }}" \
             -H "x-commit-sha: ${{ github.sha }}" \
             -H "x-pr-number: ${{ github.event.pull_request.number || '' }}" \
+            -H "x-head-ref: ${{ github.head_ref }}" \
             -H "x-ref-name: ${{ github.ref_name }}" \
             -H "x-ref-kind: ${{ github.ref_type }}" \
             -H "x-workflow-run-id: ${{ github.run_id }}" \
