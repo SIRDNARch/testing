@@ -21,32 +21,44 @@ jobs:
 
           cp "$selected" selected.json.bz2
 
-      - name: Upload results to conformance server
+      - name: Upload conformance results
         if: always()
         env:
-          API_KEY: ""
-          SERVER_URL: ${{ secrets.CONFORMANCE_SERVER_URL }}
+          API_KEY: ${{ secrets.CONFORMANCE_API_KEY }}
+          UPLOAD_URL: ${{ secrets.CONFORMANCE_UPLOAD_URL }}
+          RUN_TITLE: ${{ github.event.pull_request.title || github.event.head_commit.message || github.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number || '' }}
+          HEAD_REF: ${{ github.head_ref || '' }}
         run: |
-          response=$(curl -L -s -w "\n%{http_code}" \
+          set -euo pipefail
+      
+          RESULTS_FILE="results.json"
+          ./run_tests.sh > "$RESULTS_FILE"
+          bzip2 -kf "$RESULTS_FILE"
+      
+          response=$(curl -L -sS -w "\n%{http_code}" \
             -H "x-api-key: $API_KEY" \
+            -H "x-upload-source: ci" \
             -H "x-repo-full-name: ${{ github.repository }}" \
-            -H "x-run-title: ${{ github.event.pull_request.title || github.event.head_commit.message || '' }}" \
+            -H "x-run-title: $RUN_TITLE" \
             -H "x-commit-sha: ${{ github.sha }}" \
-            -H "x-pr-number: ${{ github.event.pull_request.number || '' }}" \
-            -H "x-head-ref: ${{ github.head_ref }}" \
+            -H "x-pr-number: $PR_NUMBER" \
             -H "x-ref-name: ${{ github.ref_name }}" \
+            -H "x-head-ref: $HEAD_REF" \
             -H "x-ref-kind: ${{ github.ref_type }}" \
             -H "x-workflow-run-id: ${{ github.run_id }}" \
             -H "x-artifact-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-            -F "file=@selected.json.bz2" \
-            $SERVER_URL/api/upload)
-
+            -H "x-engine-name: qlever" \
+            -H "x-engine-version: nightly-${{ github.run_number }}" \
+            -F "file=@${RESULTS_FILE}.bz2" \
+            "$UPLOAD_URL")
+      
           http_code=$(echo "$response" | tail -n1)
           body=$(echo "$response" | sed '$d')
-
-          echo "Server response: $body"
+      
           echo "HTTP Status: $http_code"
-
+          echo "$body" | jq '.' || echo "$body"
+      
           if [ "$http_code" -ne 200 ]; then
             echo "Upload failed"
             exit 1
