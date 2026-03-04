@@ -32,10 +32,6 @@ jobs:
         run: |
           set -euo pipefail
       
-          RESULTS_FILE="results.json"
-          ./run_tests.sh > "$RESULTS_FILE"
-          bzip2 -kf "$RESULTS_FILE"
-      
           response=$(curl -L -sS -w "\n%{http_code}" \
             -H "x-api-key: $API_KEY" \
             -H "x-upload-source: ci" \
@@ -50,7 +46,7 @@ jobs:
             -H "x-artifact-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
             -H "x-engine-name: qlever" \
             -H "x-engine-version: nightly-${{ github.run_number }}" \
-            -F "file=@${RESULTS_FILE}.bz2" \
+            -F "file=@$selected.json.bz2" \
             "$UPLOAD_URL")
       
           http_code=$(echo "$response" | tail -n1)
