@@ -45,7 +45,7 @@ jobs:
             -H "x-engine-name: qlever" \
             -H "x-engine-version: nightly-${{ github.run_number }}" \
             -F "file=@selected.json.bz2" \
-            "$UPLOAD_URL")
+            $UPLOAD_URL/api/upload)
       
           http_code=$(echo "$response" | tail -n1)
           body=$(echo "$response" | sed '$d')
