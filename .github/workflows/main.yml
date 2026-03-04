@@ -40,7 +40,10 @@ jobs:
             -H "x-ref-name: ${{ github.ref_name }}" \
             -H "x-head-ref: $HEAD_REF" \
             -H "x-ref-kind: ${{ github.ref_type }}" \
-            -H "x-workflow-run-id: ${{ github.run_id }}" \
+            -H "x-workflow-run-id: ${{ github.run_id }}" \+
+            -H "x-artifact-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            -H "x-engine-name: qlever" \
+            -H "x-engine-version: nightly-${{ github.run_number }}" \
             -F "file=@selected.json.bz2" \
             $UPLOAD_URL/api/upload)
       
