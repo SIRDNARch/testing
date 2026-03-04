@@ -44,7 +44,7 @@ jobs:
             -H "x-artifact-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
             -H "x-engine-name: qlever" \
             -H "x-engine-version: nightly-${{ github.run_number }}" \
-            -F "file=@$selected.json.bz2" \
+            -F "file=@selected.json.bz2" \
             "$UPLOAD_URL")
       
           http_code=$(echo "$response" | tail -n1)
