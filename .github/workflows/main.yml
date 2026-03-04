@@ -25,7 +25,7 @@ jobs:
         if: always()
         env:
           API_KEY: ''
-          UPLOAD_URL: ${{ secrets.CONFORMANCE_UPLOAD_URL }}
+          UPLOAD_URL: ${{ secrets.CONFORMANCE_SERVER_URL }}
           RUN_TITLE: ${{ github.event.pull_request.title || github.event.head_commit.message || github.sha }}
           PR_NUMBER: ${{ github.event.pull_request.number || '' }}
           HEAD_REF: ${{ github.head_ref || '' }}
