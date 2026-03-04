@@ -24,7 +24,7 @@ jobs:
       - name: Upload conformance results
         if: always()
         env:
-          API_KEY: ${{ secrets.CONFORMANCE_API_KEY }}
+          API_KEY: ''
           UPLOAD_URL: ${{ secrets.CONFORMANCE_UPLOAD_URL }}
           RUN_TITLE: ${{ github.event.pull_request.title || github.event.head_commit.message || github.sha }}
           PR_NUMBER: ${{ github.event.pull_request.number || '' }}
