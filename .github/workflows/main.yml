@@ -15,10 +15,16 @@ jobs:
 
       - name: Choose random result file
         run: |
-          files=("sample1.json.bz2" "sample2.json.bz2" "sample3.json.bz2")
+          mapfile -t files < <(find . -type f -name '*.json.bz2' | sort)
+
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No .json.bz2 files found in repository"
+            exit 1
+          fi
 
           selected="${files[$RANDOM % ${#files[@]}]}"
 
+          echo "Selected result file: $selected"
           cp "$selected" selected.json.bz2
 
       - name: Upload conformance results
@@ -45,7 +51,7 @@ jobs:
             -H "x-engine-name: qlever" \
             -H "x-engine-version: nightly-${{ github.run_number }}" \
             -F "file=@selected.json.bz2" \
-            $UPLOAD_URL/api/upload)
+            "$UPLOAD_URL/api/upload")
       
           http_code=$(echo "$response" | tail -n1)
           body=$(echo "$response" | sed '$d')
